@@ -1,38 +1,60 @@
-/*var miCalculadora = {
-	capturaNumero: function () {
-    let teclas = document.querySelectorAll('.tecla');
-    Array.from(teclas).forEach(tecla => {
-      tecla.addEventListener("click", function(event){
-        let valor = this.getAttribute('id');
-        console.log(valor)
-      });
-    });
-	}
-}
-*/
-
 var calculadora = ( function(){
   var display = document.getElementById('display');
   var teclas = document.querySelectorAll('.tecla');
+  var valoresConcatenados='';
+  var nuevoFormato='';
+  var nuevoValor='';
+  var simbolosConsiderados = ["+", "-", "*", "/", '', ' '];
+
+  var limpiarDisplay = function(){
+    valoresConcatenados='';
+    nuevoFormato='';
+    nuevoValor='';
+    display.innerHTML = '0';
+  }
+
+  var quitarValor = function(){
+    nuevoValor = nuevoValor.substring(0, nuevoValor.length -1);
+    display.innerHTML = nuevoValor;
+  }
+
+  var validarLongitud = function(valor){
+    let longitudPermitida = 8;
+    let longitudActual = valor.length;
+    let respuesta = false;
+    if(longitudActual <= longitudPermitida) respuesta = true;
+    return respuesta;
+  }
 
   var agregarValor = function(valor) {
     let caracteres = display.textContent;//.split('');
     let longitud = caracteres.length;
-    console.log('textContent '+caracteres);
-    console.log('length '+longitud);
-
-    if(caracteres==0 && longitud==1){
-      display.innerHTML = valor;
+    let ultimo = '';
+    let penultimo = '';
+    //localStorage.valorOperacion = valor
+    if(valor==0 && longitud==1){//|| valor=='.'
+      limpiarDisplay();
     }else{
-      /*let nuevoValor = caracteres.substr(1, longitud);
-      console.log(nuevoValor);*/
-      display.innerHTML += valor;
-      //display.innerHTML = nuevoValor;
-    }
-  }
+      valoresConcatenados += String(valor);
+      ultimo = valoresConcatenados.substring(valoresConcatenados.length -1 , valoresConcatenados.length);
+      penultimo = valoresConcatenados.substring(valoresConcatenados.length -2 , valoresConcatenados.length -1);
 
-  var limpiarDisplay = function(){
-    display.innerHTML = '0'
+      if(simbolosConsiderados.indexOf(penultimo) != -1 && ultimo=='.'){//!/^\d+$/.test(penultimo) > si no es un número
+        nuevoFormato = '0.';
+      }else if(penultimo=='.' && !/^\d+$/.test(ultimo)){//}else if(penultimo=='.' && !/^\d+$/.test(ultimo)){
+        nuevoValor = nuevoValor.substring(0, nuevoValor.length -1);//quitamos el punto
+        nuevoFormato = String(valor);
+      }else if(simbolosConsiderados.indexOf(penultimo) != -1 && simbolosConsiderados.indexOf(ultimo) != -1){
+        nuevoValor = nuevoValor.substring(0, nuevoValor.length -1);//quitamos el punto
+        nuevoFormato = String(valor);
+      }else{
+        nuevoFormato = String(valor);
+      }
+      nuevoValor += nuevoFormato;
+      if(validarLongitud(nuevoValor)) display.innerHTML = String(nuevoValor);
+    }
+    console.log('caracteres: '+caracteres+' / longitud: '+longitud+' / valor entrante: '+valor+' / nuevo valor: '+nuevoValor);
+    console.log('ultimo '+ultimo+' / penultimo '+penultimo);
   }
 
   return {
@@ -47,13 +69,15 @@ var calculadora = ( function(){
     },
     capturaTecladoNumerico: function () {
       document.addEventListener("keypress", function(event){
-        var codigo = event.which || event.keyCode;
-        //console.log("Presionada: " + codigo);
+        var codigo = event.which || event.keyCode; // || event.charCode;
+
+        console.log("Presiono: which: "+event.which+" / keyCode: "+event.keyCode+" / charCode: "+event.charCode+" / key: "+event.key);
         if(codigo === 13){
           let caracteres = display.textContent;
           console.log("Operar: "+caracteres);
         }else{
           switch(codigo){
+            case  8:  quitarValor();    break; // backspace
             case 42: agregarValor('*'); break;
             case 43: agregarValor('+'); break;
             case 45: agregarValor('-'); break;
