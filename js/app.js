@@ -11,7 +11,7 @@
 }
 */
 
-var miCalculadora = ( function(){
+var calculadora = ( function(){
   var display = document.getElementById('display');
   var teclas = document.querySelectorAll('.tecla');
 
@@ -31,12 +31,17 @@ var miCalculadora = ( function(){
     }
   }
 
+  var limpiarDisplay = function(){
+    display.innerHTML = '0'
+  }
+
   return {
     capturaTecla: function () {
       Array.from(teclas).forEach(tecla => {
         tecla.addEventListener("click", function(event){
           var valor = this.getAttribute('id');
-          console.log(valor)
+          console.log(valor);
+          if(valor=='on') limpiarDisplay();
         });
       });
     },
@@ -72,6 +77,6 @@ var miCalculadora = ( function(){
 })();
 
 window.onload=function(){
-  miCalculadora.capturaTecla();
-  miCalculadora.capturaTecladoNumerico();
+  calculadora.capturaTecla();
+  calculadora.capturaTecladoNumerico();
 }
