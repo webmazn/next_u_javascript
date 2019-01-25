@@ -7,11 +7,11 @@ var calculadora = ( function(){
   var simbolosConsiderados = ["+", "-", "*", "/", '', ' '];
   var operacionMatriz = new Array();
 
-  var limpiarDisplay = function(){
+  var limpiarDisplay = function(valor){
     valoresConcatenados='';
     nuevoFormato='';
     nuevoValor='';
-    display.innerHTML = '0';
+    display.innerHTML = valor;
   }
 
   var mostrarResultado = function(resultado){
@@ -32,26 +32,36 @@ var calculadora = ( function(){
   }
 
   var seleccionarOperacion = function(operacion){
-    operacionMatriz[0]=nuevoValor;
-    operacionMatriz[1]=operacion;
-    limpiarDisplay();
-    console.log(operacionMatriz);
+    operacionMatriz[0]=String(nuevoValor);
+    operacionMatriz[1]=String(operacion);
+    limpiarDisplay(''); //console.log(operacionMatriz);
   }
 
   var sumarValores = function(x, y){
-    return operacionMatriz[3] = eval(x+'+'+y).toFixed(2);
+    return operacionMatriz[3] = eval(x+'+'+y); //.toFixed(2)
   }
 
   var restarValores = function(x, y){
-    return operacionMatriz[3] = eval(x+'-'+y).toFixed(2);
+    return operacionMatriz[3] = eval(x+'-'+y); //.toFixed(2)
   }
 
   var multiplicarValores = function(x, y){
-    return operacionMatriz[3] = eval(x+'*'+y).toFixed(2);
+    return operacionMatriz[3] = eval(x+'*'+y); //.toFixed(2)
   }
 
   var dividirValores = function(x, y){
-    return operacionMatriz[3] = eval(x+'/'+y).toFixed(2);
+    return operacionMatriz[3] = eval(x+'/'+y); //.toFixed(2)
+  }
+
+  var raizCuadrada = function(){
+    operacionMatriz[0]=String(nuevoValor);
+    operacionMatriz[1]='√';
+    operacionMatriz[2]='-';
+    limpiarDisplay(''); //console.log(operacionMatriz);
+    operacionMatriz[3] = Math.sqrt(operacionMatriz[0]); //.toFixed(2)
+    operacionMatriz[3] = isNaN(operacionMatriz[3]) ? 'NO VALIDO' : operacionMatriz[3];
+    mostrarResultado(operacionMatriz[3]);
+    console.log(operacionMatriz);
   }
 
   var ejecutarOperacion = function(operacion){
@@ -63,37 +73,43 @@ var calculadora = ( function(){
     }
   }
 
+  var ejecutarEnterOIgual = function(){
+    operacionMatriz[2]=nuevoValor; //console.log(operacionMatriz);
+    ejecutarOperacion(operacionMatriz[1]);
+    console.log(operacionMatriz);
+  }
+
+  var volverNegativo = function(){
+    nuevoValor = eval(nuevoValor * -1)
+    mostrarResultado(String(nuevoValor));
+  }
+
   var agregarValor = function(valor) {
-    let caracteres = display.textContent;
+    //let caracteres = display.textContent;
     let longitud = nuevoValor.length;
     let ultimo = '';
     let penultimo = '';
     let contadorPunto = 0;
 
     if(valor==0 && longitud==0){
-      limpiarDisplay();
+      limpiarDisplay('0');
     }else{
       valoresConcatenados += String(valor);
       ultimo = valoresConcatenados.substring(valoresConcatenados.length -1 , valoresConcatenados.length);
       penultimo = valoresConcatenados.substring(valoresConcatenados.length -2 , valoresConcatenados.length -1);
 
       //console.log('ultimo '+ultimo+' / penultimo '+penultimo);
-
       let caracteresMatriz = valoresConcatenados.split('');
-      console.log('caracteresMatriz '+caracteresMatriz);
+      //console.log('caracteresMatriz '+caracteresMatriz);
       for(let i=0; i<caracteresMatriz.length; i++){
         if(caracteresMatriz[i] == '.' ){
           contadorPunto++;
         }
       }
-      /*if(contadorPunto>1){
-        console.log('ya* esxiste un punto: '+contadorPunto);
-      }else{
-        console.log('ingresa numero o primer punto: '+contadorPunto);
-      }*/
+
       if(contadorPunto>1 && valor=='.'){
         console.log('ya existe un punto: '+contadorPunto);
-      }else{ console.log('ingresa numero o primer punto: '+contadorPunto);
+      }else{ //console.log('ingresa numero o primer punto: '+contadorPunto);
         if(simbolosConsiderados.indexOf(penultimo) != -1 && ultimo=='.'){
           nuevoFormato = '0.';
         }else if(penultimo=='.' && !/^\d+$/.test(ultimo)){//}else if(penultimo=='.' && !/^\d+$/.test(ultimo)){
@@ -102,25 +118,38 @@ var calculadora = ( function(){
         }else{
           nuevoFormato = String(valor);
         }
+
         //console.log(nuevoFormato);
         if(validarLongitud(nuevoValor)){
           nuevoValor += nuevoFormato;
-          //display.innerHTML = String(nuevoValor);
           mostrarResultado(String(nuevoValor));
         }
       }
     }
-    console.log("________________________________________________");
     //console.log('caracteres: '+caracteres+' / longitud: '+longitud+' / valor entrante: '+valor+' / nuevo valor: '+nuevoValor);
   }
 
   return {
-    capturaTecla: function () {
+    capturaTecladoWeb: function () {
       Array.from(teclas).forEach(tecla => {
         tecla.addEventListener("click", function(event){
           var valor = this.getAttribute('id');
-          console.log(valor);
-          if(valor=='on') limpiarDisplay();
+          //console.log(valor);
+          if(valor=='on'){
+            limpiarDisplay('0');
+          }else{
+            switch(valor){
+              case 'punto': agregarValor('.'); break;
+              case 'igual': ejecutarEnterOIgual(); break;
+              case 'mas': seleccionarOperacion('+'); break;
+              case 'menos': seleccionarOperacion('-'); break;
+              case 'por': seleccionarOperacion('*'); break;
+              case 'dividido': seleccionarOperacion('/'); break;
+              case 'sign': volverNegativo(); break;
+              case 'raiz': raizCuadrada(); break;
+              default: agregarValor(valor); break;
+            }
+          }
         });
       });
     },
@@ -129,10 +158,7 @@ var calculadora = ( function(){
         var codigo = event.which || event.keyCode; // || event.charCode;
         //3console.log("Presiono: which: "+event.which+" / keyCode: "+event.keyCode+" / charCode: "+event.charCode+" / key: "+event.key);
         if(codigo === 13){
-          //let caracteres = display.textContent; console.log("Operar: "+caracteres);
-          operacionMatriz[2]=nuevoValor;
-          console.log(operacionMatriz);
-          ejecutarOperacion(operacionMatriz[1]);
+          ejecutarEnterOIgual();
         }else{
           switch(codigo){
             case  8:  quitarValor();    break;
@@ -159,6 +185,6 @@ var calculadora = ( function(){
 })();
 
 window.onload=function(){
-  calculadora.capturaTecla();
+  calculadora.capturaTecladoWeb();
   calculadora.capturaTecladoNumerico();
 }
