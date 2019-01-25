@@ -39,19 +39,19 @@ var calculadora = ( function(){
   }
 
   var sumarValores = function(x, y){
-    return operacionMatriz[3] = eval(x+'+'+y).toFixed();
+    return operacionMatriz[3] = eval(x+'+'+y).toFixed(2);
   }
 
   var restarValores = function(x, y){
-    return operacionMatriz[3] = eval(x+'-'+y).toFixed();
+    return operacionMatriz[3] = eval(x+'-'+y).toFixed(2);
   }
 
   var multiplicarValores = function(x, y){
-    return operacionMatriz[3] = eval(x+'*'+y).toFixed();
+    return operacionMatriz[3] = eval(x+'*'+y).toFixed(2);
   }
 
   var dividirValores = function(x, y){
-    return operacionMatriz[3] = eval(x+'/'+y).toFixed();
+    return operacionMatriz[3] = eval(x+'/'+y).toFixed(2);
   }
 
   var ejecutarOperacion = function(operacion){
@@ -68,6 +68,7 @@ var calculadora = ( function(){
     let longitud = nuevoValor.length;
     let ultimo = '';
     let penultimo = '';
+    let contadorPunto = 0;
 
     if(valor==0 && longitud==0){
       limpiarDisplay();
@@ -76,27 +77,41 @@ var calculadora = ( function(){
       ultimo = valoresConcatenados.substring(valoresConcatenados.length -1 , valoresConcatenados.length);
       penultimo = valoresConcatenados.substring(valoresConcatenados.length -2 , valoresConcatenados.length -1);
 
-      console.log('ultimo '+ultimo+' / penultimo '+penultimo);
+      //console.log('ultimo '+ultimo+' / penultimo '+penultimo);
 
-      if(simbolosConsiderados.indexOf(penultimo) != -1 && ultimo=='.'){
-        nuevoFormato = '0.';
-      }else if(penultimo=='.' && !/^\d+$/.test(ultimo)){//}else if(penultimo=='.' && !/^\d+$/.test(ultimo)){
-        nuevoValor = nuevoValor.substring(0, nuevoValor.length -1);//quitamos el punto
-        nuevoFormato = String(valor);
-      }else{
-        nuevoFormato = String(valor);
+      let caracteresMatriz = valoresConcatenados.split('');
+      console.log('caracteresMatriz '+caracteresMatriz);
+      for(let i=0; i<caracteresMatriz.length; i++){
+        if(caracteresMatriz[i] == '.' ){
+          contadorPunto++;
+        }
       }
-
-      console.log(nuevoFormato);
-
-      if(validarLongitud(nuevoValor)){
-        nuevoValor += nuevoFormato;
-        //display.innerHTML = String(nuevoValor);
-        mostrarResultado(String(nuevoValor));
+      /*if(contadorPunto>1){
+        console.log('ya* esxiste un punto: '+contadorPunto);
+      }else{
+        console.log('ingresa numero o primer punto: '+contadorPunto);
+      }*/
+      if(contadorPunto>1 && valor=='.'){
+        console.log('ya existe un punto: '+contadorPunto);
+      }else{ console.log('ingresa numero o primer punto: '+contadorPunto);
+        if(simbolosConsiderados.indexOf(penultimo) != -1 && ultimo=='.'){
+          nuevoFormato = '0.';
+        }else if(penultimo=='.' && !/^\d+$/.test(ultimo)){//}else if(penultimo=='.' && !/^\d+$/.test(ultimo)){
+          nuevoValor = nuevoValor.substring(0, nuevoValor.length -1);//quitamos el punto
+          nuevoFormato = String(valor);
+        }else{
+          nuevoFormato = String(valor);
+        }
+        //console.log(nuevoFormato);
+        if(validarLongitud(nuevoValor)){
+          nuevoValor += nuevoFormato;
+          //display.innerHTML = String(nuevoValor);
+          mostrarResultado(String(nuevoValor));
+        }
       }
     }
-    console.log('caracteres: '+caracteres+' / longitud: '+longitud+' / valor entrante: '+valor+' / nuevo valor: '+nuevoValor);
-
+    console.log("________________________________________________");
+    //console.log('caracteres: '+caracteres+' / longitud: '+longitud+' / valor entrante: '+valor+' / nuevo valor: '+nuevoValor);
   }
 
   return {
